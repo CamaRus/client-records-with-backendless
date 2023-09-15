@@ -16,9 +16,16 @@
           <td>{{ client.gender }}</td>
           <td>{{ client.passport }}</td>
           <td>{{ formatDate(client.dob) }}</td>
+          <!-- <td>{{ client.dob }}</td> -->
           <td>{{ client.phone }}</td>
           <td>{{ client.email }}</td>
+
           <td>
+            <!-- Кнопка "редактировать" -->
+            <button @click="editClient(client)" class="btn blue">Edit</button>
+            <!-- ////////////////////////////////////////////////////// -->
+
+            <!-- /////////////////////////////////////////////// -->
             <!-- Кнопка "удалить" -->
             <button @click="deleteClient(client)" class="btn red">
               Delete
@@ -28,6 +35,121 @@
       </tbody>
     </table>
   </div>
+
+  <!-- Форма для редактирования клиента -->
+  <div id="editModal" class="modal" v-if="isEditing">
+    <div class="modal-content">
+      <h4>Edit Client</h4>
+      <form @submit.prevent="submitForm">
+        <div class="form-group">
+          <label for="edit_first_name">First Name</label>
+          <input
+            id="edit_first_name"
+            type="text"
+            class="validate"
+            v-model="editedClient.firstName"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="edit_last_name">Last Name</label>
+          <input
+            id="edit_last_name"
+            type="text"
+            class="validate"
+            v-model="editedClient.lastName"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="edit_middle_name">Middle Name:</label>
+          <input
+            id="edit_middle_name"
+            type="text"
+            class="validate"
+            v-model="editedClient.middleName"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="edit_gender">Gender:</label>
+          <p>
+            <input
+              id="edit_man"
+              type="radio"
+              value="man"
+              v-model="editedClient.gender"
+            />
+            <label for="edit_man">Man</label>
+          </p>
+          <p>
+            <input
+              id="edit_woman"
+              type="radio"
+              value="woman"
+              v-model="editedClient.gender"
+            />
+            <label for="edit_woman">Woman</label>
+          </p>
+        </div>
+
+        <div class="form-group">
+          <label for="edit_passport">Passport Data:</label>
+          <input
+            type="text"
+            id="edit_passport"
+            required
+            v-model="editedClient.passport"
+          />
+        </div>
+        <div class="form-group">
+          <label for="edit_dob">Date of Birth:</label>
+          <input
+            type="date"
+            class="datepicker"
+            id="edit_dob"
+            required
+            v-model="editedClient.dob"
+          />
+          <!-- {{ formatDateForValueEdit(editedClient.dob) }} -->
+        </div>
+        <div class="form-group">
+          <label for="edit_phone">Phone:</label>
+          <input
+            type="tel"
+            id="edit_phone"
+            required
+            v-model="editedClient.phone"
+          />
+        </div>
+        <div class="form-group">
+          <label for="edit_email">Email:</label>
+          <input
+            type="email"
+            id="edit_email"
+            required
+            v-model="editedClient.email"
+          />
+        </div>
+      </form>
+      <div class="modal-footer">
+        <button @click="saveEditedClient" class="btn">Save</button>
+        <a
+          @click="isEditing = false"
+          class="modal-close waves-effect waves-green btn-flat"
+          >Cancel</a
+        >
+      </div>
+    </div>
+    <!-- <div class="modal-footer">
+      <button @click="saveEditedClient" class="btn">Save</button>
+      <a
+        @click="isEditing = false"
+        class="modal-close waves-effect waves-green btn-flat"
+        >Cancel</a
+      >
+    </div> -->
+  </div>
 </template>
 
 <script>
@@ -35,6 +157,7 @@ import Backendless from "backendless";
 import moment from "moment";
 
 export default {
+  components: {},
   data() {
     return {
       clients: [],
@@ -48,37 +171,13 @@ export default {
         "Phone",
         "Email",
       ],
+      isEditing: false,
+      editedClient: null,
     };
   },
   created() {
     // Вызываем метод для получения клиентов при создании компонента
     this.fetchClients();
-
-    // Слушаем событие "client-added" из компонента ClientModal.vue
-    // и обновляем данные при добавлении клиента
-    // this.$root.$on("client-added", (client) => {
-    //   this.clients.push(client);
-    //   this.$forceUpdate();
-    // });
-    // this.$forceUpdate();
-
-    // this.$root.$on("client-added", (client) => {
-    //   console.log("Client added:", client);
-    //   this.clients.push(client);
-    //   this.$forceUpdate();
-    // });
-
-    // this.$on("client-added", (client) => {
-    //   console.log("Client added:", client);
-    //   this.clients.push(client);
-    //   this.$forceUpdate();
-    // });
-
-    // Слушаем событие "client-added" от дочернего компонента ClientModal.vue
-    // emitter.on("client-added", (client) => {
-    //   console.log("Client added:", client);
-    //   this.clients.push(client);
-    // });
   },
   methods: {
     async fetchClients() {
@@ -107,11 +206,66 @@ export default {
       }
     },
 
+    async editClient(client) {
+      // Открываем модальное окно для редактирования клиента
+      this.isEditing = true;
+      this.editedClient = { ...client };
+      console.log("isEditing:", this.isEditing);
+    },
+    saveEditedClient() {
+      // Сохраняем измененного клиента в базе данных
+      Backendless.Data.of("Clients")
+        .save(this.editedClient)
+        .then(() => {
+          // Закрываем модальное окно редактирования
+          this.isEditing = false;
+
+          // Обновляем список клиентов после сохранения изменений
+          this.fetchClients();
+        })
+        .catch((error) => {
+          console.error("Error saving edited client:", error);
+        });
+    },
     formatDate(date) {
       const createdAtMoment = moment(date);
-      const formattedDate = createdAtMoment.format("DD.MM.YYYY");
+      const formattedDate = createdAtMoment.format("DD-MM-YYYY");
+      return formattedDate;
+    },
+    formatDateForValueEdit(date) {
+      const createdAtMoment = moment(date);
+      const formattedDate = createdAtMoment.format("YYYY-MM-DD");
       return formattedDate;
     },
   },
 };
 </script>
+
+<style scoped>
+.modal {
+  display: block;
+  /* display: contents; */
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.3s ease; /* Добавляем анимацию перехода */
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 500px;
+  position: relative;
+  /* height: 100vh; */
+  /* box-sizing: border-box; */
+}
+</style>

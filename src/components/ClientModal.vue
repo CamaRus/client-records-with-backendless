@@ -91,6 +91,11 @@
           >
             Add
           </button>
+          <a
+            @click="closeModal"
+            class="modal-close waves-effect waves-green btn-flat"
+            >Cancel</a
+          >
         </form>
       </div>
     </div>
@@ -98,12 +103,8 @@
 </template>
 
 <script>
-// import { mapMutations } from "vuex";
 import Backendless from "backendless";
-// import { mapActions } from "vuex";
-// import mitt from "mitt";
-
-// const emitter = mitt();
+import moment from "moment";
 
 export default {
   data() {
@@ -127,6 +128,11 @@ export default {
       console.log("closeModal is called");
       // this.$emit("visible", false); // Эмиттируем событие для закрытия модального окна
       this.$emit("close");
+    },
+    formatDateForValueEdit(date) {
+      const createdAtMoment = moment(date);
+      const formattedDate = createdAtMoment.format("YYYY-MM-DD");
+      return formattedDate;
     },
 
     // openDataPicker() {
@@ -185,7 +191,8 @@ export default {
 <style scoped>
 /* Стили для модального окна */
 .modal {
-  display: block;
+  /* display: block; */
+  display: contents;
   position: fixed;
   z-index: 1;
   left: 0;
@@ -200,12 +207,14 @@ export default {
 
 .modal-content {
   background-color: #fff;
-  margin: 15% auto;
+  margin: 2% auto;
   padding: 20px;
   border: 1px solid #888;
   width: 80%;
   max-width: 500px;
   position: relative;
+  /* height: 100vh; */
+  /* box-sizing: border-box; */
 }
 
 .close {

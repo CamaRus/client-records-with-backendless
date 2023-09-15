@@ -1,7 +1,6 @@
 import { createApp } from "vue";
 import App from "./App.vue";
-// import store from "./store";
-
+import "materialize-css/dist/css/materialize.css";
 import Backendless from "backendless";
 
 const APP_ID = "6A3982D3-ACB3-D227-FFE4-9839C74BD300";

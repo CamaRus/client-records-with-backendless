@@ -1,11 +1,6 @@
 <template>
   <div>
     <h1 class="center-align">Vue Backendless Client Records App</h1>
-    <client-modal
-      v-show="visible"
-      @close="closeModal"
-      @client-added="forceUpdate"
-    />
     <button
       class="btn modal-trigger"
       href="#modal"
@@ -14,6 +9,11 @@
     >
       Add Client
     </button>
+    <client-modal
+      v-show="visible"
+      @close="closeModal"
+      @client-added="forceUpdate"
+    />
     <client-table :key="updateKey"></client-table>
   </div>
 </template>
