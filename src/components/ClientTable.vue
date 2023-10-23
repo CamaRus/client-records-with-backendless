@@ -1,11 +1,11 @@
 <template>
   <div>
-    <table>
+    <loading-indicator :is-loading="isLoading" />
+    <table v-if="!isLoading">
       <thead>
         <tr>
           <th v-for="(column, index) in columns" :key="index">{{ column }}</th>
           <th>Actions</th>
-          <!-- Новая ячейка для кнопки "удалить" -->
         </tr>
       </thead>
       <tbody>
@@ -16,151 +16,184 @@
           <td>{{ client.gender }}</td>
           <td>{{ client.passport }}</td>
           <td>{{ formatDate(client.dob) }}</td>
-          <!-- <td>{{ client.dob }}</td> -->
           <td>{{ client.phone }}</td>
           <td>{{ client.email }}</td>
-
           <td>
-            <!-- Кнопка "редактировать" -->
             <button @click="editClient(client)" class="btn blue">Edit</button>
-            <!-- ////////////////////////////////////////////////////// -->
-
-            <!-- /////////////////////////////////////////////// -->
-            <!-- Кнопка "удалить" -->
             <button @click="deleteClient(client)" class="btn red">
               Delete
+            </button>
+            <button @click="scheduleAppointment(client)" class="btn green">
+              Schedule
             </button>
           </td>
         </tr>
       </tbody>
     </table>
+    {{ records[0] }}
   </div>
 
   <!-- Форма для редактирования клиента -->
-  <div id="editModal" class="modal" v-if="isEditing">
-    <div class="modal-content">
-      <h4>Edit Client</h4>
-      <form @submit.prevent="submitForm">
-        <div class="form-group">
-          <label for="edit_first_name">First Name</label>
-          <input
-            id="edit_first_name"
-            type="text"
-            class="validate"
-            v-model="editedClient.firstName"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="edit_last_name">Last Name</label>
-          <input
-            id="edit_last_name"
-            type="text"
-            class="validate"
-            v-model="editedClient.lastName"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="edit_middle_name">Middle Name:</label>
-          <input
-            id="edit_middle_name"
-            type="text"
-            class="validate"
-            v-model="editedClient.middleName"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="edit_gender">Gender:</label>
-          <p>
-            <input
-              id="edit_man"
-              type="radio"
-              value="man"
-              v-model="editedClient.gender"
-            />
-            <label for="edit_man">Man</label>
-          </p>
-          <p>
-            <input
-              id="edit_woman"
-              type="radio"
-              value="woman"
-              v-model="editedClient.gender"
-            />
-            <label for="edit_woman">Woman</label>
-          </p>
-        </div>
-
-        <div class="form-group">
-          <label for="edit_passport">Passport Data:</label>
-          <input
-            type="text"
-            id="edit_passport"
-            required
-            v-model="editedClient.passport"
-          />
-        </div>
-        <div class="form-group">
-          <label for="edit_dob">Date of Birth:</label>
-          <input
-            type="date"
-            class="datepicker"
-            id="edit_dob"
-            required
-            v-model="editedClient.dob"
-          />
-          <!-- {{ formatDateForValueEdit(editedClient.dob) }} -->
-        </div>
-        <div class="form-group">
-          <label for="edit_phone">Phone:</label>
-          <input
-            type="tel"
-            id="edit_phone"
-            required
-            v-model="editedClient.phone"
-          />
-        </div>
-        <div class="form-group">
-          <label for="edit_email">Email:</label>
-          <input
-            type="email"
-            id="edit_email"
-            required
-            v-model="editedClient.email"
-          />
-        </div>
-      </form>
-      <div class="modal-footer">
-        <button @click="saveEditedClient" class="btn">Save</button>
-        <a
-          @click="isEditing = false"
-          class="modal-close waves-effect waves-green btn-flat"
-          >Cancel</a
+  <transition name="modal-fade">
+    <div id="editModal" class="modal" v-if="isEditing">
+      <div class="modal-content">
+        <span class="close" @click="closeModal">&times;</span>
+        <h4>Edit Client</h4>
+        <FormKit
+          type="form"
+          id="clientdata"
+          :actions="false"
+          @submit="onSubmit"
+          :value="{
+            dob: formatDateForValueEdit(editedClient.dob),
+          }"
         >
+          <div class="form-group">
+            <FormKit
+              label="First Name"
+              type="text"
+              id="firstName"
+              v-model="editedClient.firstName"
+              name="firstname"
+              validation="required|alpha"
+            />
+          </div>
+          <div class="form-group">
+            <FormKit
+              label="Last Name"
+              type="text"
+              id="lastName"
+              v-model="editedClient.lastName"
+              name="lastname"
+              validation="required|alpha"
+            />
+          </div>
+          <div class="form-group">
+            <FormKit
+              label="Middle Name"
+              type="text"
+              id="middleName"
+              v-model="editedClient.middleName"
+              name="middlename"
+              validation="required|alpha"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="gender">Gender:</label>
+            <FormKit
+              id="man"
+              type="radio"
+              v-model="editedClient.gender"
+              name="gender"
+              :options="{
+                man: 'Man',
+                woman: 'Woman',
+              }"
+            />
+          </div>
+
+          <div class="form-group">
+            <FormKit
+              label="Passport Data"
+              type="number"
+              id="passport"
+              v-model="editedClient.passport"
+              name="passport"
+              validation="required"
+            />
+          </div>
+          <div class="form-group">
+            <FormKit
+              label="Date of Birth"
+              type="date"
+              class="datepicker"
+              id="dob"
+              v-model="editedClient.dob"
+              name="dob"
+              validation="required"
+            />
+            <!-- {{ formatDateForValueEdit(editedClient.dob) }} -->
+          </div>
+          <div class="form-group">
+            <FormKit
+              label="Phone"
+              type="number"
+              id="phone"
+              v-model="editedClient.phone"
+              name="phone"
+              validation="required"
+            />
+          </div>
+          <div class="form-group">
+            <FormKit
+              label="Email"
+              type="email"
+              id="email"
+              v-model="editedClient.email"
+              name="email"
+              validation="email"
+            />
+          </div>
+          <div class="modal-footer">
+            <button @click="saveEditedClient" class="btn">Save</button>
+            <a
+              @click="isEditing = false"
+              class="modal-close waves-effect waves-green btn-flat"
+              >Cancel</a
+            >
+          </div>
+        </FormKit>
       </div>
     </div>
-    <!-- <div class="modal-footer">
-      <button @click="saveEditedClient" class="btn">Save</button>
-      <a
-        @click="isEditing = false"
-        class="modal-close waves-effect waves-green btn-flat"
-        >Cancel</a
-      >
-    </div> -->
-  </div>
+  </transition>
+  <!-- ///////////////////////////////////////////////////////////// -->
+  <!-- Форма для записи клиента -->
+  <transition name="modal-fade">
+    <div id="scheduleModal" class="modal" v-if="isScheduling">
+      <div class="modal-content">
+        <h4>Schedule Appointment</h4>
+        <FormKit
+          type="form"
+          id="recordclient"
+          :actions="false"
+          @submit="onSubmit()"
+        >
+          <div class="form-group">
+            <FormKit
+              label="Time Record"
+              type="datetime-local"
+              class="datepicker"
+              id="time_record"
+              v-model="record.appointmentTime"
+              name="timerecord"
+            />
+          </div>
+          <div class="modal-footer">
+            <button @click="saveAppointment" class="btn">Save</button>
+            <a
+              @click="isScheduling = false"
+              class="modal-close waves-effect waves-green btn-flat"
+              >Cancel</a
+            >
+          </div>
+        </FormKit>
+      </div>
+    </div>
+  </transition>
 </template>
 
 <script>
 import Backendless from "backendless";
 import moment from "moment";
+import LoadingIndicator from "./LoadingIndicator.vue";
 
 export default {
-  components: {},
+  components: { LoadingIndicator },
   data() {
     return {
       clients: [],
+      records: [],
       columns: [
         "First Name",
         "Last Name",
@@ -173,22 +206,49 @@ export default {
       ],
       isEditing: false,
       editedClient: null,
+      isLoading: false,
+      isScheduling: false,
+      // record: null,
+      submit: false,
     };
   },
   created() {
     // Вызываем метод для получения клиентов при создании компонента
     this.fetchClients();
   },
+
+  computed: {},
+
   methods: {
+    onSubmit() {
+      this.submit = true;
+      console.log("onSubmit:", this.submit);
+    },
+
     async fetchClients() {
       try {
+        this.isLoading = true;
         // Выполняем запрос к базе данных Backendless для получения клиентов
         const queryBuilder = Backendless.DataQueryBuilder.create()
           .setSortBy(["created DESC"])
           .setPageSize(100);
         this.clients = await Backendless.Data.of("Clients").find(queryBuilder);
+        this.isLoading = false;
       } catch (error) {
         console.error("Error fetching clients:", error);
+        this.isLoading = false;
+      }
+    },
+
+    async fetchRecords() {
+      try {
+        const queryBuilder = Backendless.DataQueryBuilder.create()
+          .setSortBy(["created DESC"])
+          .setPageSize(100);
+        this.records = await Backendless.Data.of("Records").find(queryBuilder);
+        console.log(this.records[1].objectId);
+      } catch (error) {
+        console.error("Error fetching records:", error);
       }
     },
 
@@ -211,15 +271,23 @@ export default {
       this.isEditing = true;
       this.editedClient = { ...client };
       console.log("isEditing:", this.isEditing);
+      console.log(this.editedClient.firstName);
     },
+
     saveEditedClient() {
       // Сохраняем измененного клиента в базе данных
       Backendless.Data.of("Clients")
         .save(this.editedClient)
         .then(() => {
+          this.record = this.editedClient;
+          Backendless.Data.of("Records").save({
+            objectId: this.records[1].objectId,
+            clientFirstName: this.record.firstName,
+            clientLastName: this.record.lastName,
+          });
+
           // Закрываем модальное окно редактирования
           this.isEditing = false;
-
           // Обновляем список клиентов после сохранения изменений
           this.fetchClients();
         })
@@ -227,11 +295,38 @@ export default {
           console.error("Error saving edited client:", error);
         });
     },
+
+    scheduleAppointment(client) {
+      // Открываем модальное окно для выбора времени записи
+      this.isScheduling = true;
+      console.log("isSheduling: ", this.isScheduling);
+      this.record = client;
+    },
+
+    async saveAppointment() {
+      // Создайте запись времени записи в новой таблице "records"
+      console.log("Saving appointment:", this.record.appointmentTime);
+      const newRecord = {
+        appointmentTime: this.record.appointmentTime,
+      };
+      const savedRecord = await Backendless.Data.of("Records").save(newRecord);
+      const clientId = this.record.objectId;
+      console.log(savedRecord.objectId);
+      await Backendless.Data.of("Records").setRelation(
+        savedRecord.objectId,
+        "clientId",
+        [clientId]
+      );
+      this.isScheduling = false;
+      return savedRecord;
+    },
+
     formatDate(date) {
       const createdAtMoment = moment(date);
       const formattedDate = createdAtMoment.format("DD-MM-YYYY");
       return formattedDate;
     },
+
     formatDateForValueEdit(date) {
       const createdAtMoment = moment(date);
       const formattedDate = createdAtMoment.format("YYYY-MM-DD");
@@ -267,5 +362,24 @@ export default {
   position: relative;
   /* height: 100vh; */
   /* box-sizing: border-box; */
+}
+
+.close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  opacity: 0;
+  transition: opacity 0.1s ease;
+}
+
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.1s ease;
 }
 </style>

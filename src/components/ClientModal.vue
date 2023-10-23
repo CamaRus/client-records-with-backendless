@@ -1,88 +1,101 @@
 <template>
   <transition name="modal-fade">
     <div class="modal">
-      <!-- <div class="modal" :class="{ 'modal-visible': visible }"> -->
       <div class="modal-content">
         <span class="close" @click="closeModal">&times;</span>
         <h2>Add Client</h2>
-        <form class="col s12" @submit.prevent="submitForm">
+        <FormKit
+          type="form"
+          id="clientdata"
+          :actions="false"
+          :value="{ gender: 'man' }"
+          @submit="onSubmit"
+        >
           <div class="form-group">
-            <label for="firstName">First Name:</label>
-            <input
+            <FormKit
+              label="First Name"
               type="text"
               id="firstName"
               v-model="client.firstName"
-              required
+              name="firstname"
+              validation="required|alpha"
             />
           </div>
           <div class="form-group">
-            <label for="lastName">Last Name:</label>
-            <input
+            <FormKit
+              label="Last Name"
               type="text"
               id="lastName"
               v-model="client.lastName"
-              required
+              name="lastname"
+              validation="required|alpha"
             />
           </div>
           <div class="form-group">
-            <label for="middleName">Middle Name:</label>
-            <input type="text" id="middleName" v-model="client.middleName" />
+            <FormKit
+              label="Middle Name"
+              type="text"
+              id="middleName"
+              v-model="client.middleName"
+              name="middlename"
+              validation="required|alpha"
+            />
           </div>
 
           <div class="form-group">
             <label for="gender">Gender:</label>
-            <p>
-              <input
-                id="man"
-                type="radio"
-                v-model="client.gender"
-                value="man"
-              />
-              <!-- <span>Man</span> -->
-              <label for="man">Man</label>
-            </p>
-            <p>
-              <input
-                id="woman"
-                type="radio"
-                v-model="client.gender"
-                value="woman"
-              />
-              <label for="woman">Woman</label>
-            </p>
+            <FormKit
+              id="man"
+              type="radio"
+              v-model="client.gender"
+              name="gender"
+              :options="{
+                man: 'Man',
+                woman: 'Woman',
+              }"
+            />
           </div>
 
           <div class="form-group">
-            <label for="passport">Passport Data:</label>
-            <input
-              type="text"
+            <FormKit
+              label="Passport Data"
+              type="number"
               id="passport"
               v-model="client.passport"
-              required
+              name="passport"
+              validation="required"
             />
           </div>
           <div class="form-group">
-            <label for="dob">Date of Birth:</label>
-            <!-- <vue-datepicker
-              id="dob"
-              v-model="client.dob"
-              required
-            ></vue-datepicker> -->
-            <input
+            <FormKit
+              label="Date of Birth"
               type="date"
               class="datepicker"
               id="dob"
               v-model="client.dob"
-              required
+              name="dob"
+              validation="required"
             />
           </div>
           <div class="form-group">
-            <label for="phone">Phone:</label>
-            <input type="tel" id="phone" v-model="client.phone" required />
+            <FormKit
+              label="Phone"
+              type="number"
+              id="phone"
+              v-model="client.phone"
+              name="phone"
+              validation="required"
+            />
           </div>
           <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" id="email" v-model="client.email" required />
+            <FormKit
+              label="Email"
+              type="email"
+              id="email"
+              v-model="client.email"
+              name="email"
+              validation="email"
+            />
           </div>
           <button
             class="btn modal-trigger"
@@ -96,7 +109,7 @@
             class="modal-close waves-effect waves-green btn-flat"
             >Cancel</a
           >
-        </form>
+        </FormKit>
       </div>
     </div>
   </transition>
@@ -105,6 +118,8 @@
 <script>
 import Backendless from "backendless";
 import moment from "moment";
+import { useToast } from "vue-toastification";
+const toast = useToast();
 
 export default {
   data() {
@@ -118,40 +133,42 @@ export default {
         dob: null,
         phone: "",
         email: "",
-        gender: "",
+        gender: "man",
       },
+      isSubmit: false,
     };
   },
 
+  computed: {},
+
   methods: {
+    onSubmit() {
+      this.isSubmit = true;
+      console.log("isSubmit:", this.isSubmit);
+    },
+
+    showToast() {
+      toast.success("Client Added!", {
+        timeout: 50000,
+        hideProgressBar: true,
+        toastClassName: "btn",
+        toastClasses: ["btn"],
+        closeOnClick: true,
+      });
+    },
+
     closeModal() {
       console.log("closeModal is called");
       // this.$emit("visible", false); // Эмиттируем событие для закрытия модального окна
       this.$emit("close");
     },
+
     formatDateForValueEdit(date) {
       const createdAtMoment = moment(date);
       const formattedDate = createdAtMoment.format("YYYY-MM-DD");
       return formattedDate;
     },
 
-    // openDataPicker() {
-    //   document.addEventListener("DOMContentLoaded", function () {
-    //     var elems = document.querySelectorAll(".datepicker");
-    //     var instances = M.Datepicker.init(elems, options);
-    //   });
-    // },
-    // async fetchClients() {
-    //   try {
-    //     // Выполняем запрос к базе данных Backendless для получения клиентов
-    //     const queryBuilder =
-    //       Backendless.DataQueryBuilder.create().setPageSize(100);
-    //     this.clients = await Backendless.Data.of("Clients").find(queryBuilder);
-    //     console.log("fetch");
-    //   } catch (error) {
-    //     console.error("Error fetching clients:", error);
-    //   }
-    // },
     async addClientToDatabase() {
       // Создаем объект клиента на основе введенных данных
       const newClient = {
@@ -180,6 +197,10 @@ export default {
 
         // Закрываем модальное окно
         this.closeModal();
+        if (this.isSubmit) {
+          this.$formkit.reset("clientdata");
+          this.showToast();
+        }
       } catch (error) {
         console.error("Error saving client:", error);
       }
@@ -213,8 +234,6 @@ export default {
   width: 80%;
   max-width: 500px;
   position: relative;
-  /* height: 100vh; */
-  /* box-sizing: border-box; */
 }
 
 .close {

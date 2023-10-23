@@ -53,3 +53,17 @@ export default {
   },
 };
 </script>
+
+<style>
+[data-invalid] .formkit-message {
+  color: red;
+}
+[data-complete] .formkit-message {
+  color: red;
+}
+/* [data-complete] .formkit-message::after {
+  content: "✅";
+  display: block;
+  padding: 0.5em;
+} */
+</style>
