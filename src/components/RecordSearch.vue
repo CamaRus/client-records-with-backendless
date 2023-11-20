@@ -33,7 +33,7 @@
             />
           </div>
           <div class="modal-footer">
-            <button @click="saveAppointment" class="btn">Выбрать</button>
+            <button @click="searchDate" class="btn">Выбрать</button>
             <a
               @click="isDate = false"
               class="modal-close waves-effect waves-green btn-flat"
@@ -47,18 +47,24 @@
 </template>
 
 <script>
+import Backendless from "backendless";
+import { mapActions } from "vuex";
+
 export default {
   data() {
     return {
       isDate: false,
       datetime: "",
       submit: false,
+      searchDateResults: [],
+      clicked_date_search: 0,
     };
   },
 
   computed: {},
 
   methods: {
+    ...mapActions(["setSearchRecords", "setNumberOfSearches"]),
     onSubmit() {
       this.submit = true;
       console.log("onSubmit:", this.submit);
@@ -68,6 +74,24 @@ export default {
 
     chooseDate() {
       this.isDate = true;
+    },
+    async searchDate() {
+      this.$emit("clicked_date_search");
+      this.clicked_date_search += 1;
+      this.setNumberOfSearches(this.clicked_date_search);
+      try {
+        // Выполните запрос поиска клиентов в Backendless
+        var whereClause = `appointmentTime LIKE '%${this.datetime}%'`;
+        const queryBuilder = Backendless.DataQueryBuilder.create()
+          .setWhereClause(whereClause)
+          .setRelated(["clientId"]);
+        const results = await Backendless.Data.of("Records").find(queryBuilder);
+        this.setSearchRecords(results);
+        console.log(results);
+      } catch (error) {
+        this.setSearchRecords([]);
+        console.error("Error searching clients:", error);
+      }
     },
   },
 };

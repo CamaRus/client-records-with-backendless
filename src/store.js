@@ -7,6 +7,7 @@ const store = new Vuex.Store({
   state: {
     searchResults: [],
     searchRecords: [],
+    // searchDateResults: [],
     buttonSearchClick: 0,
     // fetchClients: [],
     // searchObjectIds: null,
@@ -22,6 +23,9 @@ const store = new Vuex.Store({
     updateNumberOfSearches(state, clicked) {
       state.buttonSearchClick += clicked;
     },
+    // updateSearchDateResults(state, results){
+    //   state.searchDateResults = results
+    // }
     // updateFetchClients(state, clients) {
     //   state.fetchClients = clients;
     // },
@@ -40,6 +44,9 @@ const store = new Vuex.Store({
     setNumberOfSearches({ commit }, clicked) {
       commit("updateNumberOfSearches", clicked);
     },
+    // setSearchDateResults({ commit }, results) {
+    //   commit("updateSearchDateResults", results);
+    // },
     // setFetchClients({ commit }, clients) {
     //   commit("updateFetchClients", clients);
     // },

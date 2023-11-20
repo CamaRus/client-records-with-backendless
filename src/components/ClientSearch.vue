@@ -1,5 +1,5 @@
 <template>
-  <!-- {{ updatePath }} -->
+  {{ updatePath() }}
   <div class="row">
     <form class="col s12">
       <div class="row">
@@ -21,22 +21,22 @@
         >
           Search
         </button>
-        <!-- <RecordSearch v-if="currentPath === '/records'" /> -->
+        <RecordSearch v-if="currentPath === '/records'" />
       </div>
     </form>
     <!-- {{ searchRecords }} -->
-    {{ currentPath }}
+    <!-- {{ currentPath }} -->
   </div>
 </template>
 
 <script>
 import Backendless from "backendless";
 import { mapActions } from "vuex";
-// import RecordSearch from "./RecordSearch.vue";
+import RecordSearch from "./RecordSearch.vue";
 
 export default {
   components: {
-    // RecordSearch,
+    RecordSearch,
   },
   data() {
     return {
@@ -49,17 +49,7 @@ export default {
     };
   },
 
-  computed: {
-    updatePath() {
-      //   this.currentPath = this.$route.path;
-      //   console.log(this.$route.path);
-      //   return this.currentPath;
-      return this.$route.path;
-    },
-    // fetchClients() {
-    //   return this.getFetchClients;
-    // },
-  },
+  computed: {},
 
   methods: {
     ...mapActions([
@@ -67,6 +57,13 @@ export default {
       "setSearchRecords",
       "setNumberOfSearches",
     ]),
+    updatePath() {
+      this.currentPath = this.$route.path;
+      //   console.log(this.$route.path);
+      //   return this.currentPath;
+      //   return this.$route.path;
+    },
+
     async searchClients() {
       this.$emit("clicked");
       this.clicked += 1;
