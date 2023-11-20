@@ -149,7 +149,7 @@ export default {
 
     showToast() {
       toast.success("Client Added!", {
-        timeout: 50000,
+        timeout: 3000,
         hideProgressBar: true,
         toastClassName: "btn",
         toastClasses: ["btn"],

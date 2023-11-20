@@ -5,25 +5,52 @@ import Vuex from "vuex";
 
 const store = new Vuex.Store({
   state: {
-    clients: [],
+    searchResults: [],
+    searchRecords: [],
+    buttonSearchClick: 0,
+    // fetchClients: [],
+    // searchObjectIds: null,
   },
 
-  mutations: {},
+  mutations: {
+    updateSearchResults(state, results) {
+      state.searchResults = results;
+    },
+    updateSearchRecords(state, records) {
+      state.searchRecords = records;
+    },
+    updateNumberOfSearches(state, clicked) {
+      state.buttonSearchClick += clicked;
+    },
+    // updateFetchClients(state, clients) {
+    //   state.fetchClients = clients;
+    // },
+    // updateSearchObjectIds(state, clientIds) {
+    //   state.searchObjectIds = clientIds;
+    // },
+  },
 
   actions: {
-    //     async fetchClients() {
-    //       try {
-    //         // Выполняем запрос к базе данных Backendless для получения клиентов
-    //         const queryBuilder =
-    //           Backendless.DataQueryBuilder.create().setPageSize(100);
-    //         this.clients = await Backendless.Data.of("Clients").find(queryBuilder);
-    //       } catch (error) {
-    //         console.error("Error fetching clients:", error);
-    //       }
-    //     },
+    setSearchResults({ commit }, results) {
+      commit("updateSearchResults", results);
+    },
+    setSearchRecords({ commit }, records) {
+      commit("updateSearchRecords", records);
+    },
+    setNumberOfSearches({ commit }, clicked) {
+      commit("updateNumberOfSearches", clicked);
+    },
+    // setFetchClients({ commit }, clients) {
+    //   commit("updateFetchClients", clients);
+    // },
   },
 
-  getters: {},
+  getters: {
+    getSearchResults: (state) => state.searchResults,
+    getSearchRecords: (state) => state.searchRecords,
+    getNumberOfSearches: (state) => state.buttonSearchClick,
+    // getFetchClients: (state) => state.fetchClients,
+  },
 });
 
-// export default store;
+export default store;

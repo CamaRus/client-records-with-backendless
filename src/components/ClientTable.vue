@@ -8,7 +8,29 @@
           <th>Actions</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody v-if="searchResults.length >= 1">
+        <tr v-for="client in searchResults" :key="client.objectId">
+          <td>{{ client.firstName }}</td>
+          <td>{{ client.lastName }}</td>
+          <td>{{ client.middleName }}</td>
+          <td>{{ client.gender }}</td>
+          <td>{{ client.passport }}</td>
+          <td>{{ formatDate(client.dob) }}</td>
+          <td>{{ client.phone }}</td>
+          <td>{{ client.email }}</td>
+          <td>
+            <button @click="editClient(client)" class="btn blue">Edit</button>
+            <button @click="deleteClient(client)" class="btn red">
+              Delete
+            </button>
+            <button @click="scheduleAppointment(client)" class="btn green">
+              Schedule
+            </button>
+          </td>
+        </tr>
+      </tbody>
+
+      <tbody v-else-if="getNumberOfSearches == 0">
         <tr v-for="client in clients" :key="client.objectId">
           <td>{{ client.firstName }}</td>
           <td>{{ client.lastName }}</td>
@@ -29,8 +51,11 @@
           </td>
         </tr>
       </tbody>
+
+      <tbody v-else>
+        Не найдено
+      </tbody>
     </table>
-    {{ records[0] }}
   </div>
 
   <!-- Форма для редактирования клиента -->
@@ -187,6 +212,7 @@
 import Backendless from "backendless";
 import moment from "moment";
 import LoadingIndicator from "./LoadingIndicator.vue";
+import { mapGetters } from "vuex";
 
 export default {
   components: { LoadingIndicator },
@@ -210,6 +236,7 @@ export default {
       isScheduling: false,
       // record: null,
       submit: false,
+      componentKey: 0,
     };
   },
   created() {
@@ -217,7 +244,17 @@ export default {
     this.fetchClients();
   },
 
-  computed: {},
+  mounted() {},
+
+  computed: {
+    ...mapGetters(["getSearchResults", "getNumberOfSearches"]),
+    searchResults() {
+      return this.getSearchResults;
+    },
+    searches() {
+      return this.getNumberOfSearches;
+    },
+  },
 
   methods: {
     onSubmit() {
@@ -234,26 +271,16 @@ export default {
           .setPageSize(100);
         this.clients = await Backendless.Data.of("Clients").find(queryBuilder);
         this.isLoading = false;
+        // this.setFetchClients(this.clients);
       } catch (error) {
         console.error("Error fetching clients:", error);
         this.isLoading = false;
       }
     },
 
-    async fetchRecords() {
-      try {
-        const queryBuilder = Backendless.DataQueryBuilder.create()
-          .setSortBy(["created DESC"])
-          .setPageSize(100);
-        this.records = await Backendless.Data.of("Records").find(queryBuilder);
-        console.log(this.records[1].objectId);
-      } catch (error) {
-        console.error("Error fetching records:", error);
-      }
-    },
-
     async deleteClient(client) {
       try {
+        this.deleteRecord(client);
         // Удаление клиента из базы данных по objectId
         await Backendless.Data.of("Clients").remove(client);
 
@@ -261,9 +288,40 @@ export default {
         this.clients = this.clients.filter(
           (c) => c.objectId !== client.objectId
         );
+        this.fetchClients();
       } catch (error) {
         console.error("Error deleting client:", error);
       }
+    },
+
+    async deleteRecord(client) {
+      // Предположим, что у вас есть objectId клиента
+      const clientObjectId = client.objectId;
+
+      // Создайте объект запроса
+      const queryBuilder = Backendless.DataQueryBuilder.create().setWhereClause(
+        `clientId = '${clientObjectId}'`
+      );
+
+      // Выполните запрос на поиск первой записи, связанной с клиентом
+      Backendless.Data.of("Records")
+        .findFirst(queryBuilder)
+        .then((foundRecord) => {
+          if (foundRecord) {
+            // Найденная запись - удалите ее из базы данных
+            return Backendless.Data.of("Records").remove(foundRecord);
+          } else {
+            console.log("Запись не найдена");
+            return Promise.resolve(); // Вернуть успешное разрешение, если запись не найдена
+          }
+        })
+        .then(() => {
+          console.log("Запись успешно удалена");
+        })
+        .catch((error) => {
+          // Обработка ошибок
+          console.error("Ошибка удаления записи:", error);
+        });
     },
 
     async editClient(client) {
@@ -280,11 +338,11 @@ export default {
         .save(this.editedClient)
         .then(() => {
           this.record = this.editedClient;
-          Backendless.Data.of("Records").save({
-            objectId: this.records[1].objectId,
-            clientFirstName: this.record.firstName,
-            clientLastName: this.record.lastName,
-          });
+          // Backendless.Data.of("Records").save({
+          //   objectId: this.records[1].objectId,
+          //   clientFirstName: this.record.firstName,
+          //   clientLastName: this.record.lastName,
+          // });
 
           // Закрываем модальное окно редактирования
           this.isEditing = false;

@@ -1,6 +1,7 @@
 <template>
   <div>
     <h1 class="center-align">Vue Backendless Client Records App</h1>
+    <ClientSearch @clicked="addClick" />
     <button
       class="btn modal-trigger"
       href="#modal"
@@ -14,28 +15,50 @@
       @close="closeModal"
       @client-added="forceUpdate"
     />
-    <client-table :key="updateKey"></client-table>
+    <RouterLink v-bind:to="getButtonLink()">
+      <button class="btn modal-trigger">{{ getButtonText() }}</button>
+    </RouterLink>
+    <RouterView :key="updateKey" />
+    <!-- {{ getNumberOfSearches }} -->
   </div>
 </template>
 
 <script>
-// import { ref } from "vue";
+// import { mapGetters } from "vuex";
 import ClientModal from "./components/ClientModal.vue";
-import ClientTable from "./components/ClientTable.vue";
-// import { ref } from "vue";
+import ClientSearch from "./components/ClientSearch.vue";
+// import ClientTable from "./components/ClientTable.vue";
+// import RecordTable from "./components/RecordTable.vue";
 
 export default {
   components: {
     ClientModal,
-    ClientTable,
+    ClientSearch,
+    // ClientTable,
+    // RecordTable,
   },
   data() {
     return {
       visible: false,
       updateKey: 0,
+      url: "/",
+      // numberOfSearches: 0,
     };
   },
-  computed: {},
+
+  computed: {
+    // ...mapGetters(["getNumberOfSearches"]),
+    // searches() {
+    //   return this.getNumberOfSearches;
+    // },
+    link() {
+      if (this.$route.path === "/records") {
+        return "/";
+      } else {
+        return "/";
+      }
+    },
+  },
 
   methods: {
     showModal() {
@@ -49,6 +72,18 @@ export default {
     forceUpdate() {
       this.updateKey += 1;
       console.log("forceUpdate");
+    },
+    addClick() {
+      this.numberOfSearches += 1;
+    },
+    getButtonLink() {
+      return this.$route.path === "/records" ? "/" : "/records";
+    },
+    getButtonText() {
+      // console.log("route: ", this.$route.path);
+      this.url = this.$route.path;
+      // console.log("url: ", this.url);
+      return this.$route.path === "/records" ? "Clients" : "Records";
     },
   },
 };
