@@ -1,21 +1,32 @@
 <template>
+  <!-- {{ getUserToken() }} -->
+  <!-- {{ localStorage }} -->
+  <!-- {{ getButtonLink() }} -->
+  <!-- {{ this.$route.path }} -->
+  <!-- {{ getValid() }} -->
   <div>
+    <div class="row" v-if="this.$route.path != '/auth'">
+      <div style="text-align: end"><logout-button></logout-button></div>
+    </div>
     <h1 class="center-align">Vue Backendless Client Records App</h1>
-    <ClientSearch @clicked="addClick" />
-    <button
-      class="btn modal-trigger"
-      href="#modal"
-      @click="showModal"
-      type="button"
-    >
-      Add Client
-    </button>
-    <client-modal
-      v-show="visible"
-      @close="closeModal"
-      @client-added="forceUpdate"
-    />
-    <RouterLink v-bind:to="getButtonLink()">
+    <!-- <user-auth></user-auth> -->
+    <span v-if="this.$route.path != '/auth'">
+      <ClientSearch @clicked="addClick" />
+      <button
+        class="btn modal-trigger"
+        href="#modal"
+        @click="showModal"
+        type="button"
+      >
+        Add Client
+      </button>
+      <client-modal
+        v-show="visible"
+        @close="closeModal"
+        @client-added="forceUpdate"
+      />
+    </span>
+    <RouterLink v-if="this.$route.path != '/auth'" v-bind:to="getButtonLink()">
       <button class="btn modal-trigger">{{ getButtonText() }}</button>
     </RouterLink>
     <RouterView :key="updateKey" />
@@ -24,9 +35,11 @@
 </template>
 
 <script>
-// import { mapGetters } from "vuex";
+import { mapGetters } from "vuex";
 import ClientModal from "./components/ClientModal.vue";
 import ClientSearch from "./components/ClientSearch.vue";
+import LogoutButton from "./components/LogoutButton.vue";
+// import UserAuth from "./components/UserAuth.vue";
 // import ClientTable from "./components/ClientTable.vue";
 // import RecordTable from "./components/RecordTable.vue";
 
@@ -34,6 +47,8 @@ export default {
   components: {
     ClientModal,
     ClientSearch,
+    LogoutButton,
+    // UserAuth,
     // ClientTable,
     // RecordTable,
   },
@@ -41,13 +56,23 @@ export default {
     return {
       visible: false,
       updateKey: 0,
-      url: "/",
+      url: "",
+      // userValid: false,
       // numberOfSearches: 0,
     };
   },
+  // created() {
+  //   // this.getUserValid();
+  //   this.getButtonLink();
+  // },
 
   computed: {
-    // ...mapGetters(["getNumberOfSearches"]),
+    // ...mapGetters(["getUser", "getToken"]),
+    // getUser() {
+    //   console.log("getUser: ", this.getUser);
+    //   this.userValid = this.getUser;
+    //   // return this.getUser;
+    // },
     // searches() {
     //   return this.getNumberOfSearches;
     // },
@@ -61,6 +86,23 @@ export default {
   },
 
   methods: {
+    ...mapGetters(["getToken", "getValid"]),
+    // getUserValid() {
+    //   if (this.getUser) {
+    //     this.userValid = true;
+    //   }
+    //   console.log("userValid: ", this.userValid);
+    //   // return this.getUser;
+    // },
+    // getUserToken() {
+    //   // const storedToken = localStorage.getItem("authToken");
+    //   // return localStorage;
+    //   console.log(localStorage);
+    //   // console.log(storedToken);
+    //   // console.log(this.getToken);
+    //   return this.getToken;
+    // },
+
     showModal() {
       this.visible = true;
       console.log(this.visible);
@@ -77,6 +119,7 @@ export default {
       this.numberOfSearches += 1;
     },
     getButtonLink() {
+      // this.url = this.$route.path;
       return this.$route.path === "/records" ? "/" : "/records";
     },
     getButtonText() {

@@ -9,8 +9,10 @@ const store = new Vuex.Store({
     searchRecords: [],
     // searchDateResults: [],
     buttonSearchClick: 0,
-    // fetchClients: [],
-    // searchObjectIds: null,
+    // user: false,
+    user: null,
+    authToken: null,
+    valid: false,
   },
 
   mutations: {
@@ -23,15 +25,21 @@ const store = new Vuex.Store({
     updateNumberOfSearches(state, clicked) {
       state.buttonSearchClick += clicked;
     },
-    // updateSearchDateResults(state, results){
-    //   state.searchDateResults = results
-    // }
-    // updateFetchClients(state, clients) {
-    //   state.fetchClients = clients;
+    updateUser(state, user) {
+      state.user = user;
+    },
+    updateToken(state, token) {
+      state.authToken = token;
+    },
+    // setUser(state, user) {
+    //   state.user = user;
     // },
-    // updateSearchObjectIds(state, clientIds) {
-    //   state.searchObjectIds = clientIds;
+    // setToken(state, token) {
+    //   state.authToken = token;
     // },
+    updateValid(state, valid) {
+      state.valid = valid;
+    },
   },
 
   actions: {
@@ -44,18 +52,24 @@ const store = new Vuex.Store({
     setNumberOfSearches({ commit }, clicked) {
       commit("updateNumberOfSearches", clicked);
     },
-    // setSearchDateResults({ commit }, results) {
-    //   commit("updateSearchDateResults", results);
-    // },
-    // setFetchClients({ commit }, clients) {
-    //   commit("updateFetchClients", clients);
-    // },
+    setUser({ commit }, user) {
+      commit("updateUser", user);
+    },
+    setToken({ commit }, token) {
+      commit("updateToken", token);
+    },
+    setValid({ commit }, valid) {
+      commit("updateValid", valid);
+    },
   },
 
   getters: {
     getSearchResults: (state) => state.searchResults,
     getSearchRecords: (state) => state.searchRecords,
     getNumberOfSearches: (state) => state.buttonSearchClick,
+    getUser: (state) => state.user,
+    getToken: (state) => state.authToken,
+    getValid: (state) => state.valid,
     // getFetchClients: (state) => state.fetchClients,
   },
 });

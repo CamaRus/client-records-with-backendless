@@ -2,14 +2,11 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import "materialize-css/dist/css/materialize.css";
 import Backendless from "backendless";
-// import VeeValidate from "vee-validate";
-// import VueFormulate from "@braid/vue-formulate";
 import { plugin, defaultConfig } from "@formkit/vue";
 import config from "@/formkit.config.js";
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
 import { createRouter, createWebHistory } from "vue-router";
-// import ClientTable from "./components/ClientTable.vue";
 import RecordTable from "./components/RecordTable.vue";
 import store from "./store";
 
@@ -25,13 +22,55 @@ const router = createRouter({
       name: "Clients",
       path: "/",
       component: () => import("./components/ClientTable.vue"),
+      meta: { requiresAuth: true, valid_API: true },
     },
     {
       name: "Records",
       path: "/records",
       component: RecordTable,
+      meta: { requiresAuth: true, valid_API: true },
+    },
+    {
+      name: "Auth",
+      path: "/auth",
+      component: () => import("./components/UserAuth.vue"),
+      meta: { requiresAuth: false, valid_API: false },
+    },
+    {
+      path: "/:catchAll(.*)",
+      redirect: "/",
+      meta: { requiresAuth: true, valid_API: true },
     },
   ],
+});
+
+let valid_API = false;
+
+function success(result) {
+  console.log("Is login valid?: " + result);
+  store.commit("updateValid", result);
+  console.log("validdd: ", store.getters.getValid);
+  return result;
+}
+
+function error(err) {
+  console.log(err.message);
+  console.log(err.statusCode);
+}
+
+valid_API = await Backendless.UserService.isValidLogin()
+  .then(success)
+  .catch(error);
+
+// Глобальный маршрутный хук
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth && valid_API == false) {
+    // Если пользователь не вошел в систему, перенаправление на страницу авторизации
+    next("/auth");
+  } else {
+    // В противном случае продолжение навигации
+    next();
+  }
 });
 
 const app = createApp(App);
