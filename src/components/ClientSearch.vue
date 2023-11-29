@@ -24,8 +24,6 @@
         <RecordSearch v-if="currentPath === '/records'" />
       </div>
     </form>
-    <!-- {{ searchRecords }} -->
-    <!-- {{ currentPath }} -->
   </div>
 </template>
 
@@ -43,7 +41,6 @@ export default {
       searchQuery: "",
       searchResults: [],
       findRecords: [],
-      // searchRecords: [],
       currentPath: "",
       clicked: 0,
     };
@@ -59,9 +56,6 @@ export default {
     ]),
     updatePath() {
       this.currentPath = this.$route.path;
-      //   console.log(this.$route.path);
-      //   return this.currentPath;
-      //   return this.$route.path;
     },
 
     async searchClients() {
@@ -92,8 +86,6 @@ export default {
 
     async searchRecords(results) {
       try {
-        // const results = this.searchResults;
-        // console.log("results", results);
         let searchObjectIds = results.map((obj) => obj.objectId);
 
         this.objectIds = searchObjectIds;

@@ -1,6 +1,5 @@
 <template>
   <div style="display: none">{{ getValid() }}</div>
-  <!-- {{ getValid() }} -->
   <div class="container">
     <h2 class="center-align">Авторизация</h2>
     <div class="row">
@@ -47,13 +46,10 @@
 
 <script>
 import Backendless from "backendless";
-// import LogoutButton from "./LogoutButton.vue";
 import { mapActions, mapGetters } from "vuex";
 
 export default {
-  components: {
-    // LogoutButton,
-  },
+  components: {},
   data() {
     return {
       email: "",
@@ -75,10 +71,6 @@ export default {
 
         // Обработка успешной авторизации
         console.log("Успешная авторизация:", user);
-        // console.log("Успешная авторизация:", this.getValid());
-        // Сохранение информации о пользователе и токена аутентификации в Vuex
-        // this.$store.commit("setUser", user);
-        // this.$store.commit("setToken", user["user-token"]); // предположим, что Backendless возвращает токен
         this.setUser(user.email);
         this.setToken(user["user-token"]);
         this.valid = true;
@@ -87,10 +79,6 @@ export default {
         // Сохранение токена аутентификации в localStorage
         localStorage.setItem("authToken", user["user-token"]);
         localStorage.setItem("email", user["email"]);
-        // localStorage.setItem(
-        //   "userdata",
-        //   user["Backendless_6A3982D3-ACB3-D227-FFE4-9839C74BD300"]
-        // );
         // Перенаправление пользователя на защищенный маршрут
         this.getValid();
         this.$router.push({ name: "Clients" });

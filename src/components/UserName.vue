@@ -6,13 +6,6 @@
 
 <script>
 export default {
-  // computed: {
-  //   currentUser() {
-  //     console.log(this.$store.getters.getUser);
-  //     return this.$store.getters.getUser;
-  //   },
-  // },
-
   methods: {
     getlocalStorage() {
       return localStorage.email;

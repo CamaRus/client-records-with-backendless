@@ -297,7 +297,6 @@ export default {
           .setPageSize(100);
         this.clients = await Backendless.Data.of("Clients").find(queryBuilder);
         this.isLoading = false;
-        // this.setFetchClients(this.clients);
       } catch (error) {
         console.error("Error fetching clients:", error);
         this.isLoading = false;
