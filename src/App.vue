@@ -1,12 +1,21 @@
 <template>
   <!-- {{ getUserToken() }} -->
-  <!-- {{ localStorage }} -->
+  <!-- {{ alert(localStorage) }} -->
   <!-- {{ getButtonLink() }} -->
   <!-- {{ this.$route.path }} -->
+  <!-- {{ getlocalStorage() }} -->
+  <div style="display: none">{{ getValid() }}</div>
   <!-- {{ getValid() }} -->
   <div>
-    <div class="row" v-if="this.$route.path != '/auth'">
-      <div style="text-align: end"><logout-button></logout-button></div>
+    <div
+      class="row"
+      style="position: sticky; top: 0"
+      v-if="this.$route.path != '/auth'"
+    >
+      <!-- <div><user-name></user-name></div> -->
+      <div>
+        <logout-button></logout-button>
+      </div>
     </div>
     <h1 class="center-align">Vue Backendless Client Records App</h1>
     <!-- <user-auth></user-auth> -->
@@ -18,7 +27,7 @@
         @click="showModal"
         type="button"
       >
-        Add Client
+        Добавить клиента
       </button>
       <client-modal
         v-show="visible"
@@ -39,6 +48,7 @@ import { mapGetters } from "vuex";
 import ClientModal from "./components/ClientModal.vue";
 import ClientSearch from "./components/ClientSearch.vue";
 import LogoutButton from "./components/LogoutButton.vue";
+// import UserName from "./components/UserName.vue";
 // import UserAuth from "./components/UserAuth.vue";
 // import ClientTable from "./components/ClientTable.vue";
 // import RecordTable from "./components/RecordTable.vue";
@@ -48,6 +58,7 @@ export default {
     ClientModal,
     ClientSearch,
     LogoutButton,
+    // UserName,
     // UserAuth,
     // ClientTable,
     // RecordTable,
@@ -63,45 +74,40 @@ export default {
   },
   // created() {
   //   // this.getUserValid();
-  //   this.getButtonLink();
+  //   // this.getButtonLink();
+  //   this.getValid();
+  //   console.log("created: ", this.getValid());
   // },
 
-  computed: {
-    // ...mapGetters(["getUser", "getToken"]),
-    // getUser() {
-    //   console.log("getUser: ", this.getUser);
-    //   this.userValid = this.getUser;
-    //   // return this.getUser;
-    // },
-    // searches() {
-    //   return this.getNumberOfSearches;
-    // },
-    link() {
-      if (this.$route.path === "/records") {
-        return "/";
-      } else {
-        return "/";
-      }
-    },
-  },
+  // updated() {
+  //   this.getValid();
+  //   console.log("updated: ", this.getValid());
+  // },
+
+  // computed: {
+  //   ...mapGetters(["getUser", "getToken", "getValid"]),
+  //   // getUser() {
+  //   //   console.log("getUser: ", this.getUser);
+  //   //   this.userValid = this.getUser;
+  //   //   // return this.getUser;
+  //   // },
+  //   // searches() {
+  //   //   return this.getNumberOfSearches;
+  //   // },
+  //   // link() {
+  //   //   if (this.$route.path === "/records") {
+  //   //     return "/";
+  //   //   } else {
+  //   //     return "/";
+  //   //   }
+  //   // },
+  //   getValid() {
+  //     return this.getValid;
+  //   },
+  // },
 
   methods: {
     ...mapGetters(["getToken", "getValid"]),
-    // getUserValid() {
-    //   if (this.getUser) {
-    //     this.userValid = true;
-    //   }
-    //   console.log("userValid: ", this.userValid);
-    //   // return this.getUser;
-    // },
-    // getUserToken() {
-    //   // const storedToken = localStorage.getItem("authToken");
-    //   // return localStorage;
-    //   console.log(localStorage);
-    //   // console.log(storedToken);
-    //   // console.log(this.getToken);
-    //   return this.getToken;
-    // },
 
     showModal() {
       this.visible = true;
@@ -126,7 +132,7 @@ export default {
       // console.log("route: ", this.$route.path);
       this.url = this.$route.path;
       // console.log("url: ", this.url);
-      return this.$route.path === "/records" ? "Clients" : "Records";
+      return this.$route.path === "/records" ? "Клиенты" : "Записи";
     },
   },
 };

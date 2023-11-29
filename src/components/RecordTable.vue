@@ -5,7 +5,7 @@
       <thead>
         <tr>
           <th v-for="(column, index) in columns" :key="index">{{ column }}</th>
-          <th>Actions</th>
+          <th>Действия</th>
         </tr>
       </thead>
       <tbody v-if="searchRecords.length >= 1">
@@ -21,7 +21,7 @@
           </td>
           <td>
             <button @click="deleteRecord(record)" class="btn red">
-              Delete
+              Удалить запись
             </button>
           </td>
         </tr>
@@ -40,7 +40,7 @@
           </td>
           <td>
             <button @click="deleteRecord(record)" class="btn red">
-              Delete
+              Удалить запись
             </button>
           </td>
         </tr>
@@ -58,12 +58,14 @@ import Backendless from "backendless";
 import moment from "moment";
 import LoadingIndicator from "./LoadingIndicator.vue";
 import { mapGetters } from "vuex";
+import { useToast } from "vue-toastification";
+const toast = useToast();
 
 export default {
   components: { LoadingIndicator },
   data() {
     return {
-      columns: ["Appointment Time", "First Name", "Last Name"],
+      columns: ["Дата и время записи", "Имя", "Фамилия"],
       records: [],
       isLoading: false,
     };
@@ -84,6 +86,16 @@ export default {
     },
   },
   methods: {
+    showToastDelete() {
+      toast.warning("Запись удалена!", {
+        timeout: 3000,
+        hideProgressBar: true,
+        toastClassName: "btn",
+        toastClasses: ["btn"],
+        closeOnClick: true,
+      });
+    },
+
     async fetchRecords() {
       try {
         this.isLoading = true;
@@ -108,6 +120,7 @@ export default {
         this.records = this.records.filter(
           (r) => r.objectId !== record.objectId
         );
+        this.showToastDelete();
       } catch (error) {
         console.error("Error deleting client:", error);
       }

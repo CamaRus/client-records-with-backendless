@@ -3,7 +3,7 @@
     <div class="modal">
       <div class="modal-content">
         <span class="close" @click="closeModal">&times;</span>
-        <h2>Add Client</h2>
+        <h2>Добавить клиента</h2>
         <FormKit
           type="form"
           id="clientdata"
@@ -13,7 +13,7 @@
         >
           <div class="form-group">
             <FormKit
-              label="First Name"
+              label="Имя"
               type="text"
               id="firstName"
               v-model="client.firstName"
@@ -23,7 +23,7 @@
           </div>
           <div class="form-group">
             <FormKit
-              label="Last Name"
+              label="Фамилия"
               type="text"
               id="lastName"
               v-model="client.lastName"
@@ -33,7 +33,7 @@
           </div>
           <div class="form-group">
             <FormKit
-              label="Middle Name"
+              label="Отчество"
               type="text"
               id="middleName"
               v-model="client.middleName"
@@ -43,7 +43,7 @@
           </div>
 
           <div class="form-group">
-            <label for="gender">Gender:</label>
+            <label for="gender">Пол:</label>
             <FormKit
               id="man"
               type="radio"
@@ -58,7 +58,7 @@
 
           <div class="form-group">
             <FormKit
-              label="Passport Data"
+              label="Паспортные данные"
               type="number"
               id="passport"
               v-model="client.passport"
@@ -68,7 +68,7 @@
           </div>
           <div class="form-group">
             <FormKit
-              label="Date of Birth"
+              label="Дата рождения"
               type="date"
               class="datepicker"
               id="dob"
@@ -79,7 +79,7 @@
           </div>
           <div class="form-group">
             <FormKit
-              label="Phone"
+              label="Телефон"
               type="number"
               id="phone"
               v-model="client.phone"
@@ -102,12 +102,12 @@
             type="submit"
             @click="addClientToDatabase"
           >
-            Add
+            Добавить
           </button>
           <a
             @click="closeModal"
             class="modal-close waves-effect waves-green btn-flat"
-            >Cancel</a
+            >Отмена</a
           >
         </FormKit>
       </div>
@@ -148,7 +148,7 @@ export default {
     },
 
     showToast() {
-      toast.success("Client Added!", {
+      toast.success("Клиент добавлен!", {
         timeout: 3000,
         hideProgressBar: true,
         toastClassName: "btn",

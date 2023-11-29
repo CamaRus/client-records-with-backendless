@@ -1,5 +1,6 @@
 <template>
   <div style="display: none">{{ getValid() }}</div>
+  <!-- {{ getValid() }} -->
   <div class="container">
     <h2 class="center-align">Авторизация</h2>
     <div class="row">
@@ -41,9 +42,6 @@
         </div>
       </form>
     </div>
-    <!-- <div class="row">
-      <logout-button></logout-button>
-    </div> -->
   </div>
 </template>
 
@@ -77,17 +75,24 @@ export default {
 
         // Обработка успешной авторизации
         console.log("Успешная авторизация:", user);
+        // console.log("Успешная авторизация:", this.getValid());
         // Сохранение информации о пользователе и токена аутентификации в Vuex
         // this.$store.commit("setUser", user);
         // this.$store.commit("setToken", user["user-token"]); // предположим, что Backendless возвращает токен
-        this.setUser(user);
+        this.setUser(user.email);
         this.setToken(user["user-token"]);
         this.valid = true;
         this.setValid(this.valid);
+        console.log("Успешная авторизация:", this.getValid());
         // Сохранение токена аутентификации в localStorage
         localStorage.setItem("authToken", user["user-token"]);
+        localStorage.setItem("email", user["email"]);
+        // localStorage.setItem(
+        //   "userdata",
+        //   user["Backendless_6A3982D3-ACB3-D227-FFE4-9839C74BD300"]
+        // );
         // Перенаправление пользователя на защищенный маршрут
-        // getValid;
+        this.getValid();
         this.$router.push({ name: "Clients" });
         // В этом месте вы можете перенаправить пользователя на другую страницу или выполнить другие действия после авторизации.
       } catch (error) {

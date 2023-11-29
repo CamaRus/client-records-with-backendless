@@ -37,7 +37,7 @@
             <a
               @click="isDate = false"
               class="modal-close waves-effect waves-green btn-flat"
-              >Cancel</a
+              >Отмена</a
             >
           </div>
         </FormKit>
@@ -121,8 +121,6 @@ export default {
   width: 80%;
   max-width: 500px;
   position: relative;
-  /* height: 100vh; */
-  /* box-sizing: border-box; */
 }
 
 .close {

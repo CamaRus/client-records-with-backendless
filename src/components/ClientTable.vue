@@ -5,7 +5,7 @@
       <thead>
         <tr>
           <th v-for="(column, index) in columns" :key="index">{{ column }}</th>
-          <th>Actions</th>
+          <th>Действия</th>
         </tr>
       </thead>
       <tbody v-if="searchResults.length >= 1">
@@ -19,12 +19,14 @@
           <td>{{ client.phone }}</td>
           <td>{{ client.email }}</td>
           <td>
-            <button @click="editClient(client)" class="btn blue">Edit</button>
+            <button @click="editClient(client)" class="btn blue">
+              Изменить
+            </button>
             <button @click="deleteClient(client)" class="btn red">
-              Delete
+              Удалить
             </button>
             <button @click="scheduleAppointment(client)" class="btn green">
-              Schedule
+              Записать
             </button>
           </td>
         </tr>
@@ -41,12 +43,14 @@
           <td>{{ client.phone }}</td>
           <td>{{ client.email }}</td>
           <td>
-            <button @click="editClient(client)" class="btn blue">Edit</button>
+            <button @click="editClient(client)" class="btn blue">
+              Изменить
+            </button>
             <button @click="deleteClient(client)" class="btn red">
-              Delete
+              Удалить
             </button>
             <button @click="scheduleAppointment(client)" class="btn green">
-              Schedule
+              Записать
             </button>
           </td>
         </tr>
@@ -63,7 +67,7 @@
     <div id="editModal" class="modal" v-if="isEditing">
       <div class="modal-content">
         <span class="close" @click="closeModal">&times;</span>
-        <h4>Edit Client</h4>
+        <h4>Данные клиента</h4>
         <FormKit
           type="form"
           id="clientdata"
@@ -75,7 +79,7 @@
         >
           <div class="form-group">
             <FormKit
-              label="First Name"
+              label="Имя"
               type="text"
               id="firstName"
               v-model="editedClient.firstName"
@@ -85,7 +89,7 @@
           </div>
           <div class="form-group">
             <FormKit
-              label="Last Name"
+              label="Фамилия"
               type="text"
               id="lastName"
               v-model="editedClient.lastName"
@@ -95,7 +99,7 @@
           </div>
           <div class="form-group">
             <FormKit
-              label="Middle Name"
+              label="Отчество"
               type="text"
               id="middleName"
               v-model="editedClient.middleName"
@@ -105,7 +109,7 @@
           </div>
 
           <div class="form-group">
-            <label for="gender">Gender:</label>
+            <label for="gender">Пол:</label>
             <FormKit
               id="man"
               type="radio"
@@ -120,7 +124,7 @@
 
           <div class="form-group">
             <FormKit
-              label="Passport Data"
+              label="Паспортные данные"
               type="number"
               id="passport"
               v-model="editedClient.passport"
@@ -130,7 +134,7 @@
           </div>
           <div class="form-group">
             <FormKit
-              label="Date of Birth"
+              label="Дата рождения"
               type="date"
               class="datepicker"
               id="dob"
@@ -142,7 +146,7 @@
           </div>
           <div class="form-group">
             <FormKit
-              label="Phone"
+              label="Телефон"
               type="number"
               id="phone"
               v-model="editedClient.phone"
@@ -161,11 +165,11 @@
             />
           </div>
           <div class="modal-footer">
-            <button @click="saveEditedClient" class="btn">Save</button>
+            <button @click="saveEditedClient" class="btn">Сохранить</button>
             <a
               @click="isEditing = false"
               class="modal-close waves-effect waves-green btn-flat"
-              >Cancel</a
+              >Отмена</a
             >
           </div>
         </FormKit>
@@ -177,7 +181,7 @@
   <transition name="modal-fade">
     <div id="scheduleModal" class="modal" v-if="isScheduling">
       <div class="modal-content">
-        <h4>Schedule Appointment</h4>
+        <h4>Запись клиента</h4>
         <FormKit
           type="form"
           id="recordclient"
@@ -186,7 +190,7 @@
         >
           <div class="form-group">
             <FormKit
-              label="Time Record"
+              label="Дата записи"
               type="datetime-local"
               class="datepicker"
               id="time_record"
@@ -195,11 +199,11 @@
             />
           </div>
           <div class="modal-footer">
-            <button @click="saveAppointment" class="btn">Save</button>
+            <button @click="saveAppointment" class="btn">Записать</button>
             <a
               @click="isScheduling = false"
               class="modal-close waves-effect waves-green btn-flat"
-              >Cancel</a
+              >Отмена</a
             >
           </div>
         </FormKit>
@@ -213,6 +217,8 @@ import Backendless from "backendless";
 import moment from "moment";
 import LoadingIndicator from "./LoadingIndicator.vue";
 import { mapGetters } from "vuex";
+import { useToast } from "vue-toastification";
+const toast = useToast();
 
 export default {
   components: { LoadingIndicator },
@@ -221,13 +227,13 @@ export default {
       clients: [],
       records: [],
       columns: [
-        "First Name",
-        "Last Name",
-        "Middle Name",
-        "Gender",
-        "Passport",
-        "DOB",
-        "Phone",
+        "Имя",
+        "Фамилия",
+        "Отчество",
+        "Пол",
+        "Паспорт",
+        "Дата рождения",
+        "Телефон",
         "Email",
       ],
       isEditing: false,
@@ -262,6 +268,26 @@ export default {
       console.log("onSubmit:", this.submit);
     },
 
+    showToastDelete() {
+      toast.warning("Клиент удален!", {
+        timeout: 3000,
+        hideProgressBar: true,
+        toastClassName: "btn",
+        toastClasses: ["btn"],
+        closeOnClick: true,
+      });
+    },
+
+    showToastRecord() {
+      toast.info("Клиент записан!", {
+        timeout: 3000,
+        hideProgressBar: true,
+        toastClassName: "btn",
+        toastClasses: ["btn"],
+        closeOnClick: true,
+      });
+    },
+
     async fetchClients() {
       try {
         this.isLoading = true;
@@ -288,6 +314,7 @@ export default {
         this.clients = this.clients.filter(
           (c) => c.objectId !== client.objectId
         );
+        this.showToastDelete();
         this.fetchClients();
       } catch (error) {
         console.error("Error deleting client:", error);
@@ -376,6 +403,7 @@ export default {
         [clientId]
       );
       this.isScheduling = false;
+      this.showToastRecord();
       return savedRecord;
     },
 
@@ -418,8 +446,6 @@ export default {
   width: 80%;
   max-width: 500px;
   position: relative;
-  /* height: 100vh; */
-  /* box-sizing: border-box; */
 }
 
 .close {

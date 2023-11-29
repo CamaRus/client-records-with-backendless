@@ -11,7 +11,7 @@
             class="validate"
             v-model="searchQuery"
           />
-          <label for="icon_prefix">Search</label>
+          <label for="icon_prefix">Найти</label>
         </div>
         <button
           class="btn modal-trigger"
@@ -19,7 +19,7 @@
           @click="searchClients()"
           type="button"
         >
-          Search
+          Поиск
         </button>
         <RecordSearch v-if="currentPath === '/records'" />
       </div>
